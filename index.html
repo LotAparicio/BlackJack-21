@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BlackJack-21 | Avisos Institucionales - TecNM Campus Matehuala</title>
+  <link rel="stylesheet" href="static/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <div>
+        <p class="eyebrow">TecNM Campus Matehuala · Departamento de Comunicación y Difusión</p>
+        <h1>BlackJack-21 · Gestión de Avisos Institucionales</h1>
+      </div>
+      <nav aria-label="Navegación principal" class="role-switch">
+        <button type="button" class="tab-btn active" data-view="solicitante">Vista Solicitante (CU-01)</button>
+        <button type="button" class="tab-btn" data-view="difusion">Bandeja Difusión (CU-02)</button>
+        <button type="button" class="tab-btn" data-view="seguimiento">Calendario y Reporte (CU-05)</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido-principal" class="container main-grid">
+    <section class="card notice-banner" aria-label="Cumplimiento normativo y almacenamiento">
+      <p>
+        <strong>Entorno de prueba controlado (RN-04 / RNF-06):</strong> Operación con datos simulados sin almacenar datos personales reales de alumnos.
+        El almacenamiento local en este visor HTML se guarda en el navegador (<code>localStorage</code>) y la versión completa del sistema corre con <strong>Flask + SQLite</strong>.
+      </p>
+      <div class="banner-actions">
+        <button type="button" id="btn-reset-demo" class="btn btn-secondary">Restablecer datos simulados</button>
+      </div>
+    </section>
+
+    <!-- VISTA 1: SOLICITANTE -->
+    <section id="view-solicitante" class="card view-panel active" aria-labelledby="titulo-solicitante">
+      <div class="panel-header">
+        <h2 id="titulo-solicitante">1. Solicitud de Aviso Institucional</h2>
+        <span class="badge">RF-01 · RF-02 · RF-05 · RF-07</span>
+      </div>
+
+      <form id="form-aviso" class="form-grid" novalidate>
+        <div class="field-group">
+          <label for="area-solicitante">Área solicitante *</label>
+          <select id="area-solicitante" name="area" required>
+            <option value="">Selecciona un área...</option>
+            <option value="Subdirección de Planeación y Vinculación">Subdirección de Planeación y Vinculación</option>
+            <option value="Servicios Escolares">Servicios Escolares</option>
+            <option value="Gestión Tecnológica y Vinculación">Gestión Tecnológica y Vinculación</option>
+            <option value="Dirección">Dirección</option>
+            <option value="Ingeniería en Sistemas Computacionales">Ingeniería en Sistemas Computacionales</option>
+          </select>
+          <small class="error-msg" id="err-area"></small>
+        </div>
+
+        <div class="field-group">
+          <label for="tipo-aviso">Tipo de envío *</label>
+          <select id="tipo-aviso" name="tipo" required>
+            <option value="Normal">Aviso normal (requiere aprobación de Difusión · RN-01)</option>
+            <option value="Urgente / Dirección">Aviso urgente o de Dirección (registro directo · RN-03)</option>
+          </select>
+        </div>
+
+        <div class="field-group full-width">
+          <label for="titulo-aviso">Título del aviso *</label>
+          <input
+            type="text"
+            id="titulo-aviso"
+            name="titulo"
+            placeholder="Ej. Convocatoria de becas institucionales 2026-2"
+            required
+          />
+          <small class="error-msg" id="err-titulo"></small>
+        </div>
+
+        <div class="field-group">
+          <label for="fecha-evento">Fecha del evento o fecha límite *</label>
+          <input type="date" id="fecha-evento" name="fecha" required />
+          <small class="error-msg" id="err-fecha"></small>
+        </div>
+
+        <div class="field-group">
+          <label for="lugar-aviso">Lugar o modalidad *</label>
+          <input
+            type="text"
+            id="lugar-aviso"
+            name="lugar"
+            placeholder="Ej. Auditorio Principal / Aula Magna"
+            required
+          />
+          <small class="error-msg" id="err-lugar"></small>
+        </div>
+
+        <div class="field-group full-width">
+          <label for="enlace-aviso">Enlace de registro o información *</label>
+          <input
+            type="url"
+            id="enlace-aviso"
+            name="enlace"
+            placeholder="https://matehuala.tecnm.mx/convocatoria"
+            required
+          />
+          <small class="error-msg" id="err-enlace"></small>
+        </div>
+
+        <div class="field-group full-width">
+          <label for="cuerpo-aviso">Cuerpo del mensaje (fecha, lugar y enlace visibles sin «Ver más») *</label>
+          <textarea
+            id="cuerpo-aviso"
+            name="cuerpo"
+            rows="4"
+            placeholder="Redacta el mensaje completo para que los datos clave queden visibles en el texto..."
+            required
+          ></textarea>
+          <small class="error-msg" id="err-cuerpo"></small>
+        </div>
+
+        <div id="alerta-anticipacion" class="alert-box full-width hidden" role="alert">
+          <p>
+            <strong>Advertencia de anticipación (RF-02 / RN-02):</strong> La fecha del evento o límite tiene menos de 3 días de anticipación respecto a hoy.
+          </p>
+          <label class="checkbox-inline">
+            <input type="checkbox" id="confirmar-anticipacion" />
+            <span>Confirmo el envío con poca anticipación bajo criterios del área.</span>
+          </label>
+          <small class="error-msg" id="err-anticipacion"></small>
+        </div>
+
+        <div class="card preview-box full-width">
+          <h3>Vista previa estandarizada del texto (RF-05)</h3>
+          <p id="vista-previa-texto" class="preview-content">
+            Completa los campos del formulario para visualizar el texto estandarizado con fecha, lugar y enlace.
+          </p>
+        </div>
+
+        <div class="form-actions full-width">
+          <button type="submit" class="btn btn-primary">Registrar solicitud</button>
+          <button type="button" id="btn-llenar-ejemplo" class="btn btn-secondary">Cargar ejemplo simulado</button>
+        </div>
+      </form>
+
+      <div id="resultado-folio" class="feedback-box hidden" aria-live="polite"></div>
+    </section>
+
+    <!-- VISTA 2: DIFUSIÓN -->
+    <section id="view-difusion" class="card view-panel" aria-labelledby="titulo-difusion">
+      <div class="panel-header">
+        <h2 id="titulo-difusion">2. Bandeja de Revisión Editorial y Aprobación</h2>
+        <span class="badge">RF-03 · RF-04 · RN-01 · RN-03</span>
+      </div>
+      <p class="muted">
+        Revisa los avisos pendientes, edita el texto si es necesario para cuidar la imagen institucional, aprueba para programar o rechaza indicando un motivo obligatorio.
+      </p>
+      <div id="lista-pendientes" class="stack-list"></div>
+    </section>
+
+    <!-- VISTA 3: SEGUIMIENTO, CALENDARIO Y REPORTE -->
+    <section id="view-seguimiento" class="card view-panel" aria-labelledby="titulo-seguimiento">
+      <div class="panel-header">
+        <h2 id="titulo-seguimiento">3. Seguimiento por Folio, Calendario y Reporte Mensual</h2>
+        <span class="badge">RF-06 · RF-08 · RF-09</span>
+      </div>
+
+      <div class="filters-bar">
+        <div class="field-group">
+          <label for="filtro-estado">Filtrar por estado</label>
+          <select id="filtro-estado">
+            <option value="Todos">Todos</option>
+            <option value="En revisión">En revisión</option>
+            <option value="Publicado / Programado">Publicado / Programado</option>
+            <option value="Rechazado">Rechazado</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="filtro-busqueda">Buscar por folio o título</label>
+          <input type="search" id="filtro-busqueda" placeholder="Ej. AV-101 o beca" />
+        </div>
+      </div>
+
+      <div class="metrics-strip" id="resumen-metricas"></div>
+
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Folio</th>
+              <th>Título y Área</th>
+              <th>Fecha Evento</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Detalle / Motivo</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-avisos-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>BlackJack-21 Consultoría de Software · Fundamentos de Ingeniería de Software (SCC-1007) · TecNM Campus Matehuala</p>
+      <p>Repositorio: <code>https://github.com/LotAparicio/BlackJack-21</code></p>
+    </div>
+  </footer>
+
+  <script src="static/app.js"></script>
+</body>
+</html>

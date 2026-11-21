@@ -1,0 +1,27 @@
+import os
+from flask import Flask, send_from_directory
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+app = Flask(
+    __name__,
+    static_folder=os.path.join(BASE_DIR, "static"),
+    static_url_path="/static",
+)
+
+
+@app.route("/")
+def home():
+    return send_from_directory(BASE_DIR, "index.html")
+
+
+@app.route("/<path:filename>")
+def serve_root_file(filename):
+    target_path = os.path.join(BASE_DIR, filename)
+    if os.path.isfile(target_path):
+        return send_from_directory(BASE_DIR, filename)
+    return send_from_directory(BASE_DIR, "index.html")
+
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5000, debug=True)
