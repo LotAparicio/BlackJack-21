@@ -23,41 +23,12 @@
         <button type="button" class="tab-btn" data-view="difusion">Bandeja Difusión (CU-02)</button>
         <button type="button" class="tab-btn" data-view="seguimiento">Calendario y Reporte (CU-05)</button>
         <button type="button" class="tab-btn" data-view="documentacion">Documentación (E1–E4)</button>
+        <a class="tab-btn" href="login.html">Login Matrícula</a>
       </nav>
     </div>
   </header>
 
   <main id="contenido-principal" class="container main-grid">
-    <section class="card login-box" aria-label="Identificación por matrícula">
-      <div class="panel-header">
-        <h2>Identificación por Matrícula (Simulada)</h2>
-        <span class="badge">Autoría · RN-04</span>
-      </div>
-
-      <form id="form-login-docente" class="form-grid" novalidate>
-        <div class="field-group">
-          <label for="matricula-docente">Matrícula de docente / difusión *</label>
-          <input
-            type="text"
-            id="matricula-docente"
-            placeholder="Ej. DOC-MH-104 o DIF-MH-012"
-          />
-          <small class="error-msg" id="err-matricula"></small>
-        </div>
-
-        <div class="field-group">
-          <label>Acceso rápido predeterminado</label>
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Ingresar</button>
-            <button type="button" class="btn btn-secondary btn-preset" data-matricula="DOC-MH-104">Docente (DOC-MH-104)</button>
-            <button type="button" class="btn btn-secondary btn-preset" data-matricula="DIF-MH-012">Difusión (DIF-MH-012)</button>
-          </div>
-        </div>
-      </form>
-
-      <div id="sesion-activa" class="feedback-box hidden" aria-live="polite"></div>
-    </section>
-
     <section class="card notice-banner" aria-label="Cumplimiento normativo y almacenamiento">
       <p>
         <strong>Entorno de prueba controlado (RN-04 / RNF-06):</strong> Operación con datos simulados sin almacenar datos personales reales de alumnos.
