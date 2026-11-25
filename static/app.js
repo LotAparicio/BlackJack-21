@@ -1,4 +1,32 @@
 const STORAGE_KEY = "blackjack21_avisos_simulados_v1";
+const SESSION_KEY = "blackjack21_sesion_docente_v1";
+
+const USUARIOS_PREDETERMINADOS = [
+  {
+    matricula: "DOC-MH-104",
+    nombre: "Mtro. Roberto Salgado (Simulado)",
+    rol: "Solicitante",
+    area: "Ingeniería en Sistemas Computacionales"
+  },
+  {
+    matricula: "DOC-MH-208",
+    nombre: "Ing. Laura Méndez (Simulada)",
+    rol: "Solicitante",
+    area: "Subdirección de Planeación y Vinculación"
+  },
+  {
+    matricula: "DIF-MH-012",
+    nombre: "Lic. Patricia Navarro (Simulada)",
+    rol: "Difusión",
+    area: "Departamento de Comunicación y Difusión"
+  },
+  {
+    matricula: "DIR-MH-001",
+    nombre: "Dr. Héctor Villalobos (Simulado)",
+    rol: "Dirección",
+    area: "Dirección"
+  }
+];
 
 const DEFAULT_AVISOS = [
   {
@@ -11,7 +39,10 @@ const DEFAULT_AVISOS = [
     enlace: "https://matehuala.tecnm.mx/becas-jef",
     cuerpo: "Se convoca a estudiantes interesados a la sesión informativa. Fecha: 2026-11-26 | Lugar: Auditorio del Tecnológico de Matehuala | Enlace: https://matehuala.tecnm.mx/becas-jef",
     estado: "Publicado / Programado",
-    detalle: "Programado para difusión en canal de prueba (RN-04)."
+    detalle: "Programado para difusión en canal de prueba (RN-04).",
+    creadoPorMatricula: "DOC-MH-208",
+    creadoPorNombre: "Ing. Laura Méndez (Simulada)",
+    revisadoPorMatricula: "DIF-MH-012"
   },
   {
     folio: "AV-102",
@@ -23,7 +54,10 @@ const DEFAULT_AVISOS = [
     enlace: "https://matehuala.tecnm.mx/servicio-social",
     cuerpo: "Último día para entregar documentación de servicio social. Fecha límite: 2026-11-25 | Lugar: Departamento de Gestión Tecnológica y Vinculación | Enlace: https://matehuala.tecnm.mx/servicio-social",
     estado: "En revisión",
-    detalle: "Pendiente de validación editorial por Comunicación y Difusión."
+    detalle: "Pendiente de validación editorial por Comunicación y Difusión.",
+    creadoPorMatricula: "DOC-MH-104",
+    creadoPorNombre: "Mtro. Roberto Salgado (Simulado)",
+    revisadoPorMatricula: ""
   },
   {
     folio: "AV-103",
@@ -35,9 +69,102 @@ const DEFAULT_AVISOS = [
     enlace: "https://matehuala.tecnm.mx/comunicados",
     cuerpo: "Comunicado oficial registrado con prioridad alta (RN-03). Fecha: 2026-11-21 | Lugar: Plantel TecNM Campus Matehuala | Enlace: https://matehuala.tecnm.mx/comunicados",
     estado: "Publicado / Programado",
-    detalle: "Registrado directamente sin bloqueo de aprobación previa (RF-07 / RN-03)."
+    detalle: "Registrado directamente sin bloqueo de aprobación previa (RF-07 / RN-03).",
+    creadoPorMatricula: "DIR-MH-001",
+    creadoPorNombre: "Dr. Héctor Villalobos (Simulado)",
+    revisadoPorMatricula: "DIR-MH-001"
   }
 ];
+
+function loadSesion() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+function saveSesion(usuario) {
+  try {
+    if (usuario) {
+      localStorage.setItem(SESSION_KEY, JSON.stringify(usuario));
+    } else {
+      localStorage.removeItem(SESSION_KEY);
+    }
+  } catch (err) {
+    // Si localStorage no está disponible, se mantiene en memoria
+  }
+}
+
+let sesionActual = loadSesion();
+
+function autenticarMatricula(matriculaRaw) {
+  const limpia = String(matriculaRaw || "").trim().toUpperCase();
+  const errEl = document.getElementById("err-matricula");
+  if (!limpia) {
+    if (errEl) errEl.textContent = "Escribe o selecciona una matrícula predeterminada.";
+    return null;
+  }
+  const encontrado = USUARIOS_PREDETERMINADOS.find((u) => u.matricula === limpia);
+  if (!encontrado) {
+    if (errEl) {
+      errEl.textContent = "Matrícula no encontrada. Prueba con DOC-MH-104, DOC-MH-208, DIF-MH-012 o DIR-MH-001.";
+    }
+    return null;
+  }
+  if (errEl) errEl.textContent = "";
+  sesionActual = encontrado;
+  saveSesion(sesionActual);
+
+  const areaSelect = document.getElementById("area-solicitante");
+  if (areaSelect && encontrado.area) {
+    const existeArea = Array.from(areaSelect.options).some((opt) => opt.value === encontrado.area);
+    if (existeArea) {
+      areaSelect.value = encontrado.area;
+      actualizarAlertaYVistaPrevia();
+    }
+  }
+
+  renderSesion();
+  return encontrado;
+}
+
+function cerrarSesion() {
+  sesionActual = null;
+  saveSesion(null);
+  const inputMat = document.getElementById("matricula-docente");
+  if (inputMat) inputMat.value = "";
+  renderSesion();
+}
+
+function renderSesion() {
+  const box = document.getElementById("sesion-activa");
+  if (!box) return;
+
+  if (!sesionActual) {
+    box.classList.add("hidden");
+    box.innerHTML = "";
+    return;
+  }
+
+  box.classList.remove("hidden");
+  box.innerHTML = `
+    <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;">
+      <div>
+        <strong>Sesión activa:</strong> ${escapeHtml(sesionActual.nombre)}
+        · Matrícula: <code>${escapeHtml(sesionActual.matricula)}</code>
+        · Rol: <strong>${escapeHtml(sesionActual.rol)}</strong>
+      </div>
+      <button type="button" id="btn-cerrar-sesion" class="btn btn-secondary">Cerrar sesión</button>
+    </div>
+  `;
+
+  const btnCerrar = document.getElementById("btn-cerrar-sesion");
+  if (btnCerrar) {
+    btnCerrar.addEventListener("click", cerrarSesion);
+  }
+}
 
 function loadAvisos() {
   try {
@@ -102,10 +229,11 @@ function actualizarAlertaYVistaPrevia() {
   const lineaFecha = fecha ? `Fecha: ${fecha}` : "Fecha: por definir";
   const lineaLugar = lugar ? `Lugar: ${lugar}` : "Lugar: por definir";
   const lineaEnlace = enlace ? `Enlace: ${enlace}` : "Enlace: no especificado";
+  const firmaAutor = sesionActual ? `\nPublicado por: ${sesionActual.nombre} (${sesionActual.matricula})` : "";
 
   previewEl.textContent = `${encabezado}
 ${textoBase}
-${lineaFecha} | ${lineaLugar} | ${lineaEnlace}`;
+${lineaFecha} | ${lineaLugar} | ${lineaEnlace}${firmaAutor}`;
 }
 
 function limpiarErrores() {
@@ -185,6 +313,7 @@ function renderPendientes() {
         </div>
         <p><strong>Título:</strong> ${escapeHtml(item.titulo)}</p>
         <p><strong>Fecha evento:</strong> ${escapeHtml(item.fecha)} | <strong>Lugar:</strong> ${escapeHtml(item.lugar)}</p>
+        <p><small><strong>Registrado por:</strong> ${escapeHtml(item.creadoPorNombre || "Sin matrícula")} (${escapeHtml(item.creadoPorMatricula || "N/A")})</small></p>
         <div class="field-group">
           <label for="edit-cuerpo-${item.folio}">Texto a publicar (editable por Difusión · RF-03 / RF-05)</label>
           <textarea id="edit-cuerpo-${item.folio}" rows="3">${escapeHtml(item.cuerpo)}</textarea>
@@ -211,8 +340,10 @@ function aprobarAviso(folio) {
   if (txtArea && txtArea.value.trim()) {
     avisos[idx].cuerpo = txtArea.value.trim();
   }
+  const revisorMat = sesionActual ? sesionActual.matricula : "DIF-MH-012";
   avisos[idx].estado = "Publicado / Programado";
-  avisos[idx].detalle = "Aprobado por Comunicación y Difusión para publicación en canal de prueba (RN-04).";
+  avisos[idx].revisadoPorMatricula = revisorMat;
+  avisos[idx].detalle = `Aprobado por (${revisorMat}) para publicación en canal de prueba (RN-04).`;
   saveAvisos(avisos);
   renderAll();
 }
@@ -229,8 +360,10 @@ function rechazarAviso(folio) {
   const idx = avisos.findIndex((a) => a.folio === folio);
   if (idx === -1) return;
 
+  const revisorMat = sesionActual ? sesionActual.matricula : "DIF-MH-012";
   avisos[idx].estado = "Rechazado";
-  avisos[idx].detalle = `Motivo: ${motivo}`;
+  avisos[idx].revisadoPorMatricula = revisorMat;
+  avisos[idx].detalle = `Rechazado por (${revisorMat}) · Motivo: ${motivo}`;
   saveAvisos(avisos);
   renderAll();
 }
@@ -257,7 +390,9 @@ function renderSeguimiento() {
       !textoFiltro ||
       a.folio.toLowerCase().includes(textoFiltro) ||
       a.titulo.toLowerCase().includes(textoFiltro) ||
-      a.area.toLowerCase().includes(textoFiltro);
+      a.area.toLowerCase().includes(textoFiltro) ||
+      (a.creadoPorMatricula && a.creadoPorMatricula.toLowerCase().includes(textoFiltro)) ||
+      (a.creadoPorNombre && a.creadoPorNombre.toLowerCase().includes(textoFiltro));
     return matchEstado && matchTexto;
   });
 
@@ -272,10 +407,13 @@ function renderSeguimiento() {
       let pillClass = "status-revision";
       if (a.estado === "Publicado / Programado") pillClass = "status-publicado";
       if (a.estado === "Rechazado") pillClass = "status-rechazado";
+      const autorTexto = a.creadoPorMatricula
+        ? `<br /><small>Autor: <code>${escapeHtml(a.creadoPorMatricula)}</code> · ${escapeHtml(a.creadoPorNombre || "")}</small>`
+        : "";
       return `
         <tr>
           <td><strong>${escapeHtml(a.folio)}</strong></td>
-          <td><strong>${escapeHtml(a.titulo)}</strong><br /><small>${escapeHtml(a.area)}</small></td>
+          <td><strong>${escapeHtml(a.titulo)}</strong><br /><small>${escapeHtml(a.area)}</small>${autorTexto}</td>
           <td>${escapeHtml(a.fecha)}</td>
           <td>${escapeHtml(a.tipo)}</td>
           <td><span class="status-pill ${pillClass}">${escapeHtml(a.estado)}</span></td>
@@ -295,9 +433,28 @@ function escapeHtml(str) {
 }
 
 function renderAll() {
+  renderSesion();
   renderPendientes();
   renderSeguimiento();
 }
+
+const formLogin = document.getElementById("form-login-docente");
+if (formLogin) {
+  formLogin.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const inputMat = document.getElementById("matricula-docente");
+    autenticarMatricula(inputMat ? inputMat.value : "");
+  });
+}
+
+document.querySelectorAll(".btn-preset").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const mat = btn.dataset.matricula || "";
+    const inputMat = document.getElementById("matricula-docente");
+    if (inputMat) inputMat.value = mat;
+    autenticarMatricula(mat);
+  });
+});
 
 document.querySelectorAll(".tab-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -342,6 +499,9 @@ document.getElementById("form-aviso").addEventListener("submit", (e) => {
   const enlace = document.getElementById("enlace-aviso").value.trim();
   const cuerpo = document.getElementById("cuerpo-aviso").value.trim();
 
+  const autorMat = sesionActual ? sesionActual.matricula : "SIN-MATRICULA";
+  const autorNom = sesionActual ? sesionActual.nombre : "Usuario de prueba no identificado";
+
   const esUrgente = tipo === "Urgente / Dirección";
   const nuevoAviso = {
     folio: generarFolio(),
@@ -354,8 +514,11 @@ document.getElementById("form-aviso").addEventListener("submit", (e) => {
     cuerpo,
     estado: esUrgente ? "Publicado / Programado" : "En revisión",
     detalle: esUrgente
-      ? "Aviso urgente/Dirección registrado directamente (RF-07 / RN-03)."
-      : "Enviado a la bandeja de Comunicación y Difusión para revisión editorial (RF-03)."
+      ? `Aviso urgente/Dirección registrado por ${autorMat} (RF-07 / RN-03).`
+      : `Enviado por ${autorMat} a Comunicación y Difusión para revisión editorial (RF-03).`,
+    creadoPorMatricula: autorMat,
+    creadoPorNombre: autorNom,
+    revisadoPorMatricula: esUrgente ? autorMat : ""
   };
 
   avisos.unshift(nuevoAviso);
@@ -366,6 +529,7 @@ document.getElementById("form-aviso").addEventListener("submit", (e) => {
   feedback.classList.remove("hidden");
   feedback.innerHTML = `
     <strong>Solicitud registrada con folio ${escapeHtml(nuevoAviso.folio)}.</strong>
+    Autor: <code>${escapeHtml(autorMat)}</code> (${escapeHtml(autorNom)}) ·
     Estado actual: <strong>${escapeHtml(nuevoAviso.estado)}</strong>.
     ${esUrgente ? "Registrado con prioridad directa (RN-03)." : "Disponible en la bandeja de Difusión para revisión."}
   `;
