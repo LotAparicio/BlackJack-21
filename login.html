@@ -20,21 +20,21 @@
   </header>
 
   <main class="container main-grid">
-    <section class="card notice-banner" aria-label="Control de acceso">
+    <section class="card notice-banner" aria-label="Identificación simulada">
       <p>
-        <strong>Acceso restringido a personal registrado (RN-04 / RNF-06):</strong> Ingresa con tu matrícula, nombre registrado y NIP de acceso. No está habilitado el registro de cuentas nuevas.
+        <strong>Identificación simulada (RN-04 / RNF-06):</strong> Módulo de acceso independiente con docentes predeterminados para fines de trazabilidad académica. El acceso al sistema principal permanece bloqueado hasta iniciar sesión; no es posible crear cuentas nuevas.
       </p>
     </section>
 
     <section class="card" aria-labelledby="titulo-login">
       <div class="panel-header">
-        <h2 id="titulo-login">Inicio de Sesión Docente</h2>
-        <span class="badge">NIP · Trazabilidad</span>
+        <h2 id="titulo-login">Iniciar Sesión con Matrícula</h2>
+        <span class="badge">Trazabilidad · RN-04</span>
       </div>
 
       <form id="form-login-nip" class="form-grid" novalidate>
         <div class="field-group">
-          <label for="login-matricula">Matrícula del docente *</label>
+          <label for="login-matricula">Matrícula institucional (simulada) *</label>
           <input
             type="text"
             id="login-matricula"
@@ -56,68 +56,33 @@
           <small class="error-msg" id="err-login-nombre"></small>
         </div>
 
-        <div class="field-group full-width">
+        <div class="field-group">
           <label for="login-nip">Contraseña tipo NIP *</label>
           <input
             type="password"
             id="login-nip"
             inputmode="numeric"
             maxlength="6"
-            placeholder="••••"
+            placeholder="Ej. 1234"
             autocomplete="current-password"
             required
           />
           <small class="error-msg" id="err-login-nip"></small>
         </div>
 
-        <div class="form-actions full-width">
-          <button type="submit" class="btn btn-primary">Iniciar sesión</button>
-          <button type="button" id="btn-autocompletar-prueba" class="btn btn-secondary">Rellenar ejemplo de prueba</button>
+        <div class="field-group">
+          <label>Perfiles predeterminados de prueba</label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Ingresar</button>
+            <button type="button" class="btn btn-secondary btn-quick" data-mat="DOC-MH-104">DOC-MH-104 (Sistemas)</button>
+            <button type="button" class="btn btn-secondary btn-quick" data-mat="DOC-MH-208">DOC-MH-208 (Planeación)</button>
+            <button type="button" class="btn btn-secondary btn-quick" data-mat="DIF-MH-012">DIF-MH-012 (Difusión)</button>
+            <button type="button" class="btn btn-secondary btn-quick" data-mat="DIR-MH-001">DIR-MH-001 (Dirección)</button>
+          </div>
         </div>
       </form>
 
-      <div class="card sub-card" style="margin-top: 20px;">
-        <h3>Credenciales predeterminadas de prueba (entorno simulado)</h3>
-        <p class="muted">Solo cuentas autorizadas previamente; no es posible crear cuentas desde esta interfaz.</p>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Matrícula</th>
-                <th>Nombre del docente</th>
-                <th>NIP</th>
-                <th>Área / Rol</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><code>DOC-MH-104</code></td>
-                <td>Mtro. Roberto Salgado</td>
-                <td><code>1234</code></td>
-                <td>Sistemas Computacionales · Solicitante</td>
-              </tr>
-              <tr>
-                <td><code>DOC-MH-208</code></td>
-                <td>Ing. Laura Méndez</td>
-                <td><code>2468</code></td>
-                <td>Planeación y Vinculación · Solicitante</td>
-              </tr>
-              <tr>
-                <td><code>DIF-MH-012</code></td>
-                <td>Lic. Patricia Navarro</td>
-                <td><code>4321</code></td>
-                <td>Comunicación y Difusión · Difusión</td>
-              </tr>
-              <tr>
-                <td><code>DIR-MH-001</code></td>
-                <td>Dr. Héctor Villalobos</td>
-                <td><code>9001</code></td>
-                <td>Dirección · Urgente / Dirección</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <div id="estado-sesion" class="feedback-box hidden" aria-live="polite" style="margin-top: 16px;"></div>
     </section>
   </main>
 
@@ -170,53 +135,57 @@
         .replace(/[\u0300-\u036f]/g, "");
     }
 
-    document.getElementById("btn-autocompletar-prueba").addEventListener("click", () => {
-      document.getElementById("login-matricula").value = "DOC-MH-104";
-      document.getElementById("login-nombre").value = "Mtro. Roberto Salgado";
-      document.getElementById("login-nip").value = "1234";
+    function limpiarErroresLogin() {
+      document.getElementById("err-login-matricula").textContent = "";
+      document.getElementById("err-login-nombre").textContent = "";
+      document.getElementById("err-login-nip").textContent = "";
+    }
+
+    document.querySelectorAll(".btn-quick").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const docente = DOCENTES_AUTORIZADOS.find((u) => u.matricula === btn.dataset.mat);
+        if (!docente) return;
+        limpiarErroresLogin();
+        document.getElementById("login-matricula").value = docente.matricula;
+        document.getElementById("login-nombre").value = docente.nombre;
+        document.getElementById("login-nip").value = docente.nip;
+      });
     });
 
     document.getElementById("form-login-nip").addEventListener("submit", (e) => {
       e.preventDefault();
+      limpiarErroresLogin();
 
       const matInput = document.getElementById("login-matricula").value.trim().toUpperCase();
       const nomInput = document.getElementById("login-nombre").value.trim();
       const nipInput = document.getElementById("login-nip").value.trim();
 
-      const errMat = document.getElementById("err-login-matricula");
-      const errNom = document.getElementById("err-login-nombre");
-      const errNip = document.getElementById("err-login-nip");
-
-      errMat.textContent = "";
-      errNom.textContent = "";
-      errNip.textContent = "";
-
       if (!matInput) {
-        errMat.textContent = "Ingresa la matrícula del docente.";
+        document.getElementById("err-login-matricula").textContent = "Ingresa la matrícula institucional.";
         return;
       }
       if (!nomInput) {
-        errNom.textContent = "Ingresa el nombre del docente.";
+        document.getElementById("err-login-nombre").textContent = "Ingresa el nombre del docente.";
         return;
       }
       if (!nipInput) {
-        errNip.textContent = "Ingresa el NIP de acceso.";
+        document.getElementById("err-login-nip").textContent = "Ingresa el NIP de acceso.";
         return;
       }
 
       const docente = DOCENTES_AUTORIZADOS.find((u) => u.matricula === matInput);
       if (!docente) {
-        errMat.textContent = "Matrícula no registrada. No es posible crear cuentas nuevas.";
+        document.getElementById("err-login-matricula").textContent = "Matrícula no registrada. Solo cuentas predeterminadas.";
         return;
       }
 
       if (normalizarTexto(docente.nombre) !== normalizarTexto(nomInput)) {
-        errNom.textContent = "El nombre no coincide con la matrícula ingresada.";
+        document.getElementById("err-login-nombre").textContent = "El nombre no coincide con la matrícula.";
         return;
       }
 
       if (docente.nip !== nipInput) {
-        errNip.textContent = "NIP incorrecto.";
+        document.getElementById("err-login-nip").textContent = "NIP incorrecto.";
         return;
       }
 
