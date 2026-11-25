@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Acceso por Matrícula · TecNM Campus Matehuala</title>
+  <title>Acceso Docente · TecNM Campus Matehuala</title>
   <link rel="stylesheet" href="static/styles.css" />
 </head>
 <body>
@@ -13,53 +13,111 @@
         <img src="static/logo-itm-mh.png" alt="Escudo institucional IT MH" class="brand-logo" />
         <div>
           <p class="eyebrow">TecNM Campus Matehuala · Departamento de Comunicación y Difusión</p>
-          <h1>Acceso por Matrícula Docente / Difusión</h1>
+          <h1>Gestión de Avisos Institucionales</h1>
         </div>
       </div>
-      <nav aria-label="Navegación" class="role-switch">
-        <a class="tab-btn" href="index.html">Volver al Sistema Principal</a>
-      </nav>
     </div>
   </header>
 
   <main class="container main-grid">
-    <section class="card notice-banner" aria-label="Entorno simulado">
+    <section class="card notice-banner" aria-label="Control de acceso">
       <p>
-        <strong>Identificación simulada (RN-04 / RNF-06):</strong> Módulo de acceso independiente con matrículas predeterminadas de prueba para fines de trazabilidad académica.
+        <strong>Acceso restringido a personal registrado (RN-04 / RNF-06):</strong> Ingresa con tu matrícula, nombre registrado y NIP de acceso. No está habilitado el registro de cuentas nuevas.
       </p>
     </section>
 
     <section class="card" aria-labelledby="titulo-login">
       <div class="panel-header">
-        <h2 id="titulo-login">Iniciar Sesión con Matrícula</h2>
-        <span class="badge">Trazabilidad · RN-04</span>
+        <h2 id="titulo-login">Inicio de Sesión Docente</h2>
+        <span class="badge">NIP · Trazabilidad</span>
       </div>
 
-      <form id="form-login-aparte" class="form-grid" novalidate>
+      <form id="form-login-nip" class="form-grid" novalidate>
         <div class="field-group">
-          <label for="matricula-input">Matrícula institucional (simulada) *</label>
+          <label for="login-matricula">Matrícula del docente *</label>
           <input
             type="text"
-            id="matricula-input"
+            id="login-matricula"
             placeholder="Ej. DOC-MH-104"
+            autocomplete="username"
             required
           />
-          <small class="error-msg" id="err-matricula"></small>
+          <small class="error-msg" id="err-login-matricula"></small>
         </div>
 
         <div class="field-group">
-          <label>Perfiles predeterminados de prueba</label>
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Ingresar</button>
-            <button type="button" class="btn btn-secondary btn-quick" data-mat="DOC-MH-104">DOC-MH-104 (Sistemas)</button>
-            <button type="button" class="btn btn-secondary btn-quick" data-mat="DOC-MH-208">DOC-MH-208 (Planeación)</button>
-            <button type="button" class="btn btn-secondary btn-quick" data-mat="DIF-MH-012">DIF-MH-012 (Difusión)</button>
-            <button type="button" class="btn btn-secondary btn-quick" data-mat="DIR-MH-001">DIR-MH-001 (Dirección)</button>
-          </div>
+          <label for="login-nombre">Nombre del docente *</label>
+          <input
+            type="text"
+            id="login-nombre"
+            placeholder="Ej. Mtro. Roberto Salgado"
+            required
+          />
+          <small class="error-msg" id="err-login-nombre"></small>
+        </div>
+
+        <div class="field-group full-width">
+          <label for="login-nip">Contraseña tipo NIP *</label>
+          <input
+            type="password"
+            id="login-nip"
+            inputmode="numeric"
+            maxlength="6"
+            placeholder="••••"
+            autocomplete="current-password"
+            required
+          />
+          <small class="error-msg" id="err-login-nip"></small>
+        </div>
+
+        <div class="form-actions full-width">
+          <button type="submit" class="btn btn-primary">Iniciar sesión</button>
+          <button type="button" id="btn-autocompletar-prueba" class="btn btn-secondary">Rellenar ejemplo de prueba</button>
         </div>
       </form>
 
-      <div id="estado-sesion" class="feedback-box hidden" aria-live="polite" style="margin-top: 16px;"></div>
+      <div class="card sub-card" style="margin-top: 20px;">
+        <h3>Credenciales predeterminadas de prueba (entorno simulado)</h3>
+        <p class="muted">Solo cuentas autorizadas previamente; no es posible crear cuentas desde esta interfaz.</p>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Matrícula</th>
+                <th>Nombre del docente</th>
+                <th>NIP</th>
+                <th>Área / Rol</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>DOC-MH-104</code></td>
+                <td>Mtro. Roberto Salgado</td>
+                <td><code>1234</code></td>
+                <td>Sistemas Computacionales · Solicitante</td>
+              </tr>
+              <tr>
+                <td><code>DOC-MH-208</code></td>
+                <td>Ing. Laura Méndez</td>
+                <td><code>2468</code></td>
+                <td>Planeación y Vinculación · Solicitante</td>
+              </tr>
+              <tr>
+                <td><code>DIF-MH-012</code></td>
+                <td>Lic. Patricia Navarro</td>
+                <td><code>4321</code></td>
+                <td>Comunicación y Difusión · Difusión</td>
+              </tr>
+              <tr>
+                <td><code>DIR-MH-001</code></td>
+                <td>Dr. Héctor Villalobos</td>
+                <td><code>9001</code></td>
+                <td>Dirección · Urgente / Dirección</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
   </main>
 
@@ -73,86 +131,107 @@
   <script>
     const LOGIN_SESSION_KEY = "tecnm_mh_sesion_matricula_v1";
 
-    const USUARIOS_SIMULADOS = [
-      { matricula: "DOC-MH-104", nombre: "Mtro. Roberto Salgado (Simulado)", rol: "Solicitante", area: "Ingeniería en Sistemas Computacionales" },
-      { matricula: "DOC-MH-208", nombre: "Ing. Laura Méndez (Simulada)", rol: "Solicitante", area: "Subdirección de Planeación y Vinculación" },
-      { matricula: "DIF-MH-012", nombre: "Lic. Patricia Navarro (Simulada)", rol: "Difusión", area: "Departamento de Comunicación y Difusión" },
-      { matricula: "DIR-MH-001", nombre: "Dr. Héctor Villalobos (Simulado)", rol: "Dirección", area: "Dirección" }
+    const DOCENTES_AUTORIZADOS = [
+      {
+        matricula: "DOC-MH-104",
+        nombre: "Mtro. Roberto Salgado",
+        nip: "1234",
+        rol: "Solicitante",
+        area: "Ingeniería en Sistemas Computacionales"
+      },
+      {
+        matricula: "DOC-MH-208",
+        nombre: "Ing. Laura Méndez",
+        nip: "2468",
+        rol: "Solicitante",
+        area: "Subdirección de Planeación y Vinculación"
+      },
+      {
+        matricula: "DIF-MH-012",
+        nombre: "Lic. Patricia Navarro",
+        nip: "4321",
+        rol: "Difusión",
+        area: "Departamento de Comunicación y Difusión"
+      },
+      {
+        matricula: "DIR-MH-001",
+        nombre: "Dr. Héctor Villalobos",
+        nip: "9001",
+        rol: "Dirección",
+        area: "Dirección"
+      }
     ];
 
-    function escapar(texto) {
-      return String(texto)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;");
+    function normalizarTexto(str) {
+      return String(str || "")
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
     }
 
-    function mostrarSesion() {
-      const box = document.getElementById("estado-sesion");
-      let sesion = null;
-      try {
-        sesion = JSON.parse(localStorage.getItem(LOGIN_SESSION_KEY) || "null");
-      } catch (e) {
-        sesion = null;
-      }
+    document.getElementById("btn-autocompletar-prueba").addEventListener("click", () => {
+      document.getElementById("login-matricula").value = "DOC-MH-104";
+      document.getElementById("login-nombre").value = "Mtro. Roberto Salgado";
+      document.getElementById("login-nip").value = "1234";
+    });
 
-      if (!sesion) {
-        box.classList.add("hidden");
-        box.innerHTML = "";
-        return;
-      }
-
-      box.classList.remove("hidden");
-      box.innerHTML = `
-        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;">
-          <div>
-            <strong>Sesión iniciada:</strong> ${escapar(sesion.nombre)} ·
-            Matrícula: <code>${escapar(sesion.matricula)}</code> ·
-            Rol: <strong>${escapar(sesion.rol)}</strong> (${escapar(sesion.area)})
-          </div>
-          <button type="button" id="btn-salir" class="btn btn-secondary">Cerrar sesión</button>
-        </div>
-      `;
-
-      document.getElementById("btn-salir").addEventListener("click", () => {
-        localStorage.removeItem(LOGIN_SESSION_KEY);
-        document.getElementById("matricula-input").value = "";
-        mostrarSesion();
-      });
-    }
-
-    function ingresarConMatricula(valor) {
-      const limpia = String(valor || "").trim().toUpperCase();
-      const errEl = document.getElementById("err-matricula");
-      if (!limpia) {
-        errEl.textContent = "Ingresa o selecciona una matrícula predeterminada.";
-        return;
-      }
-      const usuario = USUARIOS_SIMULADOS.find((u) => u.matricula === limpia);
-      if (!usuario) {
-        errEl.textContent = "Matrícula no válida. Usa DOC-MH-104, DOC-MH-208, DIF-MH-012 o DIR-MH-001.";
-        return;
-      }
-      errEl.textContent = "";
-      localStorage.setItem(LOGIN_SESSION_KEY, JSON.stringify(usuario));
-      mostrarSesion();
-    }
-
-    document.getElementById("form-login-aparte").addEventListener("submit", (e) => {
+    document.getElementById("form-login-nip").addEventListener("submit", (e) => {
       e.preventDefault();
-      ingresarConMatricula(document.getElementById("matricula-input").value);
-    });
 
-    document.querySelectorAll(".btn-quick").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const mat = btn.dataset.mat;
-        document.getElementById("matricula-input").value = mat;
-        ingresarConMatricula(mat);
-      });
-    });
+      const matInput = document.getElementById("login-matricula").value.trim().toUpperCase();
+      const nomInput = document.getElementById("login-nombre").value.trim();
+      const nipInput = document.getElementById("login-nip").value.trim();
 
-    mostrarSesion();
+      const errMat = document.getElementById("err-login-matricula");
+      const errNom = document.getElementById("err-login-nombre");
+      const errNip = document.getElementById("err-login-nip");
+
+      errMat.textContent = "";
+      errNom.textContent = "";
+      errNip.textContent = "";
+
+      if (!matInput) {
+        errMat.textContent = "Ingresa la matrícula del docente.";
+        return;
+      }
+      if (!nomInput) {
+        errNom.textContent = "Ingresa el nombre del docente.";
+        return;
+      }
+      if (!nipInput) {
+        errNip.textContent = "Ingresa el NIP de acceso.";
+        return;
+      }
+
+      const docente = DOCENTES_AUTORIZADOS.find((u) => u.matricula === matInput);
+      if (!docente) {
+        errMat.textContent = "Matrícula no registrada. No es posible crear cuentas nuevas.";
+        return;
+      }
+
+      if (normalizarTexto(docente.nombre) !== normalizarTexto(nomInput)) {
+        errNom.textContent = "El nombre no coincide con la matrícula ingresada.";
+        return;
+      }
+
+      if (docente.nip !== nipInput) {
+        errNip.textContent = "NIP incorrecto.";
+        return;
+      }
+
+      localStorage.setItem(
+        LOGIN_SESSION_KEY,
+        JSON.stringify({
+          matricula: docente.matricula,
+          nombre: docente.nombre,
+          rol: docente.rol,
+          area: docente.area
+        })
+      );
+
+      window.location.href = "index.html";
+    });
   </script>
 </body>
 </html>
