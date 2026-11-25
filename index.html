@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TecNM Campus Matehuala</title>
+  <title>TecNM Campus Matehuala · Avisos Institucionales</title>
   <link rel="stylesheet" href="static/styles.css" />
 </head>
 <body>
@@ -15,6 +15,7 @@
         <img src="static/logo-itm-mh.png" alt="Escudo institucional IT MH" class="brand-logo" />
         <div>
           <p class="eyebrow">TecNM Campus Matehuala · Departamento de Comunicación y Difusión</p>
+          <h1>Gestión de Avisos Institucionales</h1>
         </div>
       </div>
       <nav aria-label="Navegación principal" class="role-switch">
@@ -27,6 +28,36 @@
   </header>
 
   <main id="contenido-principal" class="container main-grid">
+    <section class="card login-box" aria-label="Identificación por matrícula">
+      <div class="panel-header">
+        <h2>Identificación por Matrícula (Simulada)</h2>
+        <span class="badge">Autoría · RN-04</span>
+      </div>
+
+      <form id="form-login-docente" class="form-grid" novalidate>
+        <div class="field-group">
+          <label for="matricula-docente">Matrícula de docente / difusión *</label>
+          <input
+            type="text"
+            id="matricula-docente"
+            placeholder="Ej. DOC-MH-104 o DIF-MH-012"
+          />
+          <small class="error-msg" id="err-matricula"></small>
+        </div>
+
+        <div class="field-group">
+          <label>Acceso rápido predeterminado</label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Ingresar</button>
+            <button type="button" class="btn btn-secondary btn-preset" data-matricula="DOC-MH-104">Docente (DOC-MH-104)</button>
+            <button type="button" class="btn btn-secondary btn-preset" data-matricula="DIF-MH-012">Difusión (DIF-MH-012)</button>
+          </div>
+        </div>
+      </form>
+
+      <div id="sesion-activa" class="feedback-box hidden" aria-live="polite"></div>
+    </section>
+
     <section class="card notice-banner" aria-label="Cumplimiento normativo y almacenamiento">
       <p>
         <strong>Entorno de prueba controlado (RN-04 / RNF-06):</strong> Operación con datos simulados sin almacenar datos personales reales de alumnos.
@@ -206,7 +237,7 @@
     <section id="view-documentacion" class="card view-panel" aria-labelledby="titulo-docs">
       <div class="panel-header">
         <h2 id="titulo-docs">4. Documentación del Proyecto (Entregas E1–E4 y Libro Completo)</h2>
-        <span class="badge">SCC-1007 · BlackJack-21</span>
+        <span class="badge">SCC-1007 · TecNM Matehuala</span>
       </div>
 
       <p class="muted">
@@ -275,7 +306,7 @@
 
   <footer class="site-footer">
     <div class="container footer-inner">
-      <p>BlackJack-21 Consultoría de Software · Fundamentos de Ingeniería de Software (SCC-1007) · TecNM Campus Matehuala</p>
+      <p>Fundamentos de Ingeniería de Software (SCC-1007) · TecNM Campus Matehuala</p>
       <p>Repositorio: <code>https://github.com/LotAparicio/BlackJack-21</code></p>
     </div>
   </footer>
