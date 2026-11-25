@@ -126,7 +126,7 @@ function autenticarMatricula(matriculaRaw) {
     }
   }
 
-  renderSesion();
+  renderAll();
   return encontrado;
 }
 
@@ -135,7 +135,7 @@ function cerrarSesion() {
   saveSesion(null);
   const inputMat = document.getElementById("matricula-docente");
   if (inputMat) inputMat.value = "";
-  renderSesion();
+  renderAll();
 }
 
 function renderSesion() {
@@ -163,6 +163,61 @@ function renderSesion() {
   const btnCerrar = document.getElementById("btn-cerrar-sesion");
   if (btnCerrar) {
     btnCerrar.addEventListener("click", cerrarSesion);
+  }
+}
+
+function aplicarPermisosVista() {
+  const identificado = Boolean(sesionActual);
+  const esDifusion = identificado && sesionActual.rol === "Difusión";
+
+  // 1. Bloquear formulario de Solicitante si no hay sesión
+  const formAviso = document.getElementById("form-aviso");
+  if (formAviso) {
+    formAviso.querySelectorAll("input, select, textarea, button").forEach((el) => {
+      el.disabled = !identificado;
+    });
+  }
+
+  let avisoSolicitante = document.getElementById("aviso-bloqueo-solicitante");
+  if (!identificado) {
+    if (!avisoSolicitante && formAviso) {
+      avisoSolicitante = document.createElement("div");
+      avisoSolicitante.id = "aviso-bloqueo-solicitante";
+      avisoSolicitante.className = "alert-box";
+      avisoSolicitante.style.marginBottom = "14px";
+      avisoSolicitante.innerHTML =
+        "<strong>Acceso restringido:</strong> Identifícate con tu matrícula de docente o dirección para registrar o publicar avisos. La pestaña de <strong>Documentación (E1–E4)</strong> sigue disponible sin iniciar sesión.";
+      formAviso.parentNode.insertBefore(avisoSolicitante, formAviso);
+    }
+  } else if (avisoSolicitante) {
+    avisoSolicitante.remove();
+  }
+
+  // 2. Bloquear acciones de Difusión si no está autenticado como Difusión
+  const contPendientes = document.getElementById("lista-pendientes");
+  let avisoDifusion = document.getElementById("aviso-bloqueo-difusion");
+  if (!esDifusion) {
+    if (!avisoDifusion && contPendientes) {
+      avisoDifusion = document.createElement("div");
+      avisoDifusion.id = "aviso-bloqueo-difusion";
+      avisoDifusion.className = "alert-box";
+      avisoDifusion.style.marginBottom = "12px";
+      avisoDifusion.innerHTML = !identificado
+        ? "<strong>Revisión editorial bloqueada:</strong> Inicia sesión con una matrícula de Difusión (ej. <code>DIF-MH-012</code>) para editar, aprobar o rechazar avisos."
+        : `<strong>Permiso limitado:</strong> Tu rol actual es <strong>${escapeHtml(sesionActual.rol)}</strong>. Solo Difusión (<code>DIF-MH-012</code>) puede aprobar o rechazar solicitudes.`;
+      contPendientes.parentNode.insertBefore(avisoDifusion, contPendientes);
+    } else if (avisoDifusion) {
+      avisoDifusion.innerHTML = !identificado
+        ? "<strong>Revisión editorial bloqueada:</strong> Inicia sesión con una matrícula de Difusión (ej. <code>DIF-MH-012</code>) para editar, aprobar o rechazar avisos."
+        : `<strong>Permiso limitado:</strong> Tu rol actual es <strong>${escapeHtml(sesionActual.rol)}</strong>. Solo Difusión (<code>DIF-MH-012</code>) puede aprobar o rechazar solicitudes.`;
+    }
+    if (contPendientes) {
+      contPendientes.querySelectorAll("textarea, input, button").forEach((el) => {
+        el.disabled = true;
+      });
+    }
+  } else if (avisoDifusion) {
+    avisoDifusion.remove();
   }
 }
 
@@ -245,6 +300,11 @@ function limpiarErrores() {
 function validarFormulario() {
   limpiarErrores();
   let valido = true;
+
+  if (!sesionActual) {
+    alert("Debes iniciar sesión con tu matrícula antes de registrar un aviso.");
+    return false;
+  }
 
   const area = document.getElementById("area-solicitante").value.trim();
   const tipo = document.getElementById("tipo-aviso").value;
@@ -333,6 +393,11 @@ function renderPendientes() {
 }
 
 function aprobarAviso(folio) {
+  if (!sesionActual || sesionActual.rol !== "Difusión") {
+    alert("Solo una sesión de Difusión (DIF-MH-012) puede aprobar y programar avisos.");
+    return;
+  }
+
   const txtArea = document.getElementById(`edit-cuerpo-${folio}`);
   const idx = avisos.findIndex((a) => a.folio === folio);
   if (idx === -1) return;
@@ -340,7 +405,7 @@ function aprobarAviso(folio) {
   if (txtArea && txtArea.value.trim()) {
     avisos[idx].cuerpo = txtArea.value.trim();
   }
-  const revisorMat = sesionActual ? sesionActual.matricula : "DIF-MH-012";
+  const revisorMat = sesionActual.matricula;
   avisos[idx].estado = "Publicado / Programado";
   avisos[idx].revisadoPorMatricula = revisorMat;
   avisos[idx].detalle = `Aprobado por (${revisorMat}) para publicación en canal de prueba (RN-04).`;
@@ -349,6 +414,11 @@ function aprobarAviso(folio) {
 }
 
 function rechazarAviso(folio) {
+  if (!sesionActual || sesionActual.rol !== "Difusión") {
+    alert("Solo una sesión de Difusión (DIF-MH-012) puede rechazar avisos.");
+    return;
+  }
+
   const motivoInput = document.getElementById(`motivo-rechazo-${folio}`);
   const motivo = motivoInput ? motivoInput.value.trim() : "";
   if (!motivo) {
@@ -360,7 +430,7 @@ function rechazarAviso(folio) {
   const idx = avisos.findIndex((a) => a.folio === folio);
   if (idx === -1) return;
 
-  const revisorMat = sesionActual ? sesionActual.matricula : "DIF-MH-012";
+  const revisorMat = sesionActual.matricula;
   avisos[idx].estado = "Rechazado";
   avisos[idx].revisadoPorMatricula = revisorMat;
   avisos[idx].detalle = `Rechazado por (${revisorMat}) · Motivo: ${motivo}`;
@@ -436,6 +506,7 @@ function renderAll() {
   renderSesion();
   renderPendientes();
   renderSeguimiento();
+  aplicarPermisosVista();
 }
 
 const formLogin = document.getElementById("form-login-docente");
@@ -463,6 +534,7 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     btn.classList.add("active");
     const target = document.getElementById(`view-${btn.dataset.view}`);
     if (target) target.classList.add("active");
+    aplicarPermisosVista();
   });
 });
 
@@ -472,6 +544,10 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
 });
 
 document.getElementById("btn-llenar-ejemplo").addEventListener("click", () => {
+  if (!sesionActual) {
+    alert("Inicia sesión con una matrícula primero para usar el formulario.");
+    return;
+  }
   const fechaFutura = new Date();
   fechaFutura.setDate(fechaFutura.getDate() + 5);
   const isoFecha = fechaFutura.toISOString().split("T")[0];
@@ -499,8 +575,8 @@ document.getElementById("form-aviso").addEventListener("submit", (e) => {
   const enlace = document.getElementById("enlace-aviso").value.trim();
   const cuerpo = document.getElementById("cuerpo-aviso").value.trim();
 
-  const autorMat = sesionActual ? sesionActual.matricula : "SIN-MATRICULA";
-  const autorNom = sesionActual ? sesionActual.nombre : "Usuario de prueba no identificado";
+  const autorMat = sesionActual.matricula;
+  const autorNom = sesionActual.nombre;
 
   const esUrgente = tipo === "Urgente / Dirección";
   const nuevoAviso = {
