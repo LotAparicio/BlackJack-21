@@ -7,6 +7,12 @@
   <link rel="stylesheet" href="static/styles.css" />
 </head>
 <body>
+  <script>
+    if (!localStorage.getItem("tecnm_mh_sesion_matricula_v1")) {
+      window.location.replace("login.html");
+    }
+  </script>
+
   <a class="skip-link" href="#contenido-principal">Saltar al contenido principal</a>
 
   <header class="site-header">
@@ -23,7 +29,7 @@
         <button type="button" class="tab-btn" data-view="difusion">Bandeja Difusión (CU-02)</button>
         <button type="button" class="tab-btn" data-view="seguimiento">Calendario y Reporte (CU-05)</button>
         <button type="button" class="tab-btn" data-view="documentacion">Documentación (E1–E4)</button>
-        <a class="tab-btn" href="login.html">Login Matrícula</a>
+        <button type="button" class="tab-btn" id="btn-cerrar-sesion-nav">Cerrar sesión</button>
       </nav>
     </div>
   </header>
@@ -283,5 +289,11 @@
   </footer>
 
   <script src="static/app.js"></script>
+  <script>
+    document.getElementById("btn-cerrar-sesion-nav")?.addEventListener("click", () => {
+      localStorage.removeItem("tecnm_mh_sesion_matricula_v1");
+      window.location.href = "login.html";
+    });
+  </script>
 </body>
 </html>
